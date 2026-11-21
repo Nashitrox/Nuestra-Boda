@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10131b">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Nuestra Boda">
+<title>Nuestra Boda</title>
+<style>
+:root{color-scheme:dark;--line:#293244;--text:#f3f5fa;--muted:#9aa6ba;--green:#8bd6a5;--pink:#ff9fb2;--purple:#c0a2ff;--orange:#ffc27d;--red:#ff8e98}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#2a1c2e 0,#0c0f16 50%);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+.wrap{max-width:780px;margin:auto;padding:20px 14px 56px}.brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#ff9fb2,#c0a2ff);display:grid;place-items:center;color:#101722;font-size:21px}h1{font-size:19px;margin:0;letter-spacing:-.03em}.eyebrow{font-size:11px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:4px}.tab{white-space:nowrap}.tab.active{background:#3a2a44;border-color:#8a6a9e}
+.btn{border:1px solid var(--line);background:#ffffff08;color:var(--text);padding:9px 12px;border-radius:11px;font:600 13px inherit;cursor:pointer}.btn:active{transform:scale(.98)}.btn.small{padding:6px 9px;font-size:12px}.btn.primary{background:var(--pink);color:#2a1020;border:0}.btn.danger{color:var(--red)}
+.card{background:linear-gradient(160deg,rgba(32,28,46,.98),rgba(19,24,35,.98));border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.grid .card{margin:0;padding:14px}
+.label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}.big{font-size:26px;letter-spacing:-.04em;font-weight:750;margin:2px 0}.sub{font-size:12px;color:var(--muted)}.bar{height:7px;background:#30394a;border-radius:99px;overflow:hidden;margin:8px 0 4px}.fill{height:100%;border-radius:99px}
+.list{display:grid;gap:8px;margin-top:10px}.entry{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0e1420;border:1px solid #273144;border-radius:12px;padding:10px 11px}.entry-main{min-width:0;flex:1}.entry-title{font-weight:650}.entry-meta{font-size:12px;color:var(--muted)}.entry-actions{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}.empty{font-size:13px;color:var(--muted);padding:10px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.dim{opacity:.55}h3{font-size:15px;margin:0}.warn{color:var(--orange)}.bad{color:var(--red)}.ok{color:var(--green)}.gh{display:flex;justify-content:space-between;margin:16px 0 0}a{color:var(--blue,#82b8ff)}
+input,textarea,select{font-size:16px!important}
+@media(max-width:520px){.entry{align-items:flex-start;flex-direction:column}.entry-actions{justify-content:flex-start}.big{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="brand"><div class="logo">♥</div><div><div class="eyebrow">Planificación</div><h1>Nuestra Boda</h1></div></div>
+<div class="tabs" id="tabs"></div>
+<div id="view"></div>
+<div class="sub" style="text-align:center;margin-top:18px">Tus datos se guardan solo en este dispositivo.</div>
+</div>
+<script>
+const K='boda-v1',CATS=['Vestuario','Decoración','Comida y bebida','Recuerdos','Belleza','Papelería','Otros'],PRI=['Imprescindible','Ideal','Si sobra'],ETAPAS=['12 meses antes','9 meses antes','6 meses antes','3 meses antes','1 mes antes','Última semana'];
+const SEED_T=[[0,'Definir presupuesto total'],[0,'Elegir fecha y tipo de ceremonia'],[0,'Reservar el local'],[0,'Armar lista preliminar de invitados'],[1,'Contratar fotógrafo y videógrafo'],[1,'Contratar banquetera o catering'],[1,'Elegir música (DJ o banda)'],[1,'Buscar vestido y traje'],[2,'Enviar "save the date"'],[2,'Contratar florista y decoración'],[2,'Reservar luna de miel'],[2,'Elegir anillos'],[3,'Enviar invitaciones'],[3,'Prueba de menú'],[3,'Primera prueba de vestido y traje'],[3,'Tramitar papeles del matrimonio civil'],[4,'Confirmar asistencia final'],[4,'Armar distribución de mesas'],[4,'Prueba de maquillaje y peinado'],[4,'Confirmar pagos y horarios con proveedores'],[5,'Preparar itinerario del día'],[5,'Pagar saldos pendientes'],[5,'Preparar el bolso del día (ver "No olvidar")'],[5,'Descansar y desconectarse']];
+const SEED_N=['Anillos','Carnet de identidad / documentos','Votos escritos','Kit de emergencia (costurero, alfileres, curitas)','Cargadores y power bank','Maquillaje para retoques','Zapatos cómodos de repuesto','Sobres con pagos y propinas','Lista de teléfonos de proveedores','Medicamentos y analgésicos','Pañuelos','Ropa de cambio y maleta de luna de miel'];
+let S={fecha:'',presu:0,col:10,inv:0,items:[],provs:[],pagos:[],tareas:[],noolv:[],init:0};
+try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
+if(!S.init){S.tareas=SEED_T.map(([e,t],i)=>({id:i+1,t,e,ok:false}));S.noolv=SEED_N.map((t,i)=>({id:100+i,t,ok:false}));S.init=1;localStorage.setItem(K,JSON.stringify(S))}
+const $=id=>document.getElementById(id),save=()=>localStorage.setItem(K,JSON.stringify(S));
+const $c=n=>(n<0?'-':'')+'$'+Math.round(Math.abs(n)).toLocaleString('es-CL');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const uid=()=>Date.now()+Math.floor(Math.random()*1000),fD=d=>d.slice(8)+'/'+d.slice(5,7)+'/'+d.slice(0,4);
+const sumBy=(a,f)=>a.reduce((n,x)=>n+f(x),0);
+const ask=(m,d)=>{const v=prompt(m,d);return v===null?null:v.trim()};
+function askN(m,d,z){const v=ask(m,d);if(v===null)return null;const n=Number(v.replace(/\./g,'').replace(',','.'));if(!Number.isFinite(n)||n<0||(n===0&&!z)){alert('Ingresa un número válido.');return null}return n}
+function askDate(def){const v=ask('Fecha (AAAA-MM-DD). Escribe "hoy" para la de hoy',def||'hoy');if(v===null)return null;if(v===''||v.toLowerCase()==='hoy')return today();if(!/^\d{4}-\d{2}-\d{2}$/.test(v)||isNaN(new Date(v+'T12:00:00'))){alert('Fecha inválida. Usa AAAA-MM-DD.');return null}return v}
+function pick(t,l,d){const v=ask(t+'\n'+l.map((c,i)=>`${i+1}) ${c}`).join('\n'),d||'1');if(v===null)return null;const i=Number(v)-1;if(!l[i]){alert('Elige un número de la lista.');return null}return i}
+const bar=(p,c)=>`<div class="bar"><div class="fill" style="width:${Math.max(0,Math.min(100,p))}%;background:${c||'var(--green)'}"></div></div>`;
+const row=(t,m,b,x)=>`<div class="entry ${x||''}"><div class="entry-main"><div class="entry-title">${esc(t)}</div><div class="entry-meta">${m}</div></div><div class="entry-actions">${b}</div></div>`;
+const bt=(l,f,c)=>`<button class="btn small ${c||''}" onclick="${f}">${l}</button>`,add=(l,f)=>`<div class="row"><button class="btn primary" onclick="${f}">${l}</button></div>`;
+const del=(k,id)=>bt('×',`rm('${k}',${id})`,'danger');
+let tab='res';const TABS=[['res','Resumen'],['com','Compras'],['pro','Proveedores'],['chk','Checklist'],['no','No olvidar']];
+window.go=t=>{tab=t;render()};
+window.rm=(k,id)=>{if(!confirm('¿Eliminar?'))return;S[k]=S[k].filter(x=>x.id!==id);save();render()};
+const sub=i=>i.q*(i.real!=null?i.real:i.est);
+
+/* Ajustes del resumen */
+window.setFecha=()=>{const d=askDate(S.fecha||'');if(d===null)return;S.fecha=d;save();render()};
+window.setPresu=()=>{const a=askN('Presupuesto total de la boda',S.presu||'');if(a===null)return;S.presu=a;save();render()};
+window.setCol=()=>{const a=askN('% del presupuesto que reservas para imprevistos',S.col,1);if(a===null)return;S.col=Math.min(50,a);save();render()};
+window.setInv=()=>{const a=askN('Número de invitados (para calcular el costo por persona)',S.inv||'',1);if(a===null)return;S.inv=Math.floor(a);save();render()};
+/* Compras */
+window.addI=()=>{const n=ask('¿Qué necesitas comprar?');if(!n)return;const c=pick('Categoría:',CATS);if(c===null)return;const q=askN('Cantidad','1');if(q===null)return;const e=askN('Precio estimado por unidad','',1);if(e===null)return;const p=pick('Prioridad:',PRI);if(p===null)return;S.items.push({id:uid(),n,cat:CATS[c],q,est:e,real:null,ok:false,pri:p});save();render()};
+window.editI=id=>{const i=S.items.find(x=>x.id===id),n=ask('Nombre',i.n);if(!n)return;const q=askN('Cantidad',i.q);if(q===null)return;const e=askN('Precio estimado por unidad',i.est,1);if(e===null)return;const r=ask('Precio real por unidad (vacío = aún no sé)',i.real??'');if(r===null)return;const rn=r===''?null:Number(r.replace(/\./g,'').replace(',','.'));if(rn!==null&&(!Number.isFinite(rn)||rn<0))return alert('Precio inválido.');Object.assign(i,{n,q,est:e,real:rn});save();render()};
+window.togI=id=>{const i=S.items.find(x=>x.id===id);if(!i.ok){const r=askN('Precio real pagado por unidad',i.real??i.est,1);if(r===null)return;i.real=r}i.ok=!i.ok;save();render()};
+/* Proveedores y pagos */
+window.addPv=()=>{const n=ask('Nombre del proveedor');if(!n)return;const s=ask('Servicio (ej: Fotografía, Banquetería)','')||'';const t=ask('Teléfono (opcional)','')||'';const tot=askN('Total acordado o cotizado',' ',1);if(tot===null)return;S.provs.push({id:uid(),n,s,t,tot});save();render()};
+window.editPv=id=>{const p=S.provs.find(x=>x.id===id),tot=askN('Total acordado',p.tot,1);if(tot===null)return;const t=ask('Teléfono',p.t||'');if(t===null)return;Object.assign(p,{tot,t});save();render()};
+window.rmPv=id=>{if(!confirm('¿Eliminar proveedor y sus pagos?'))return;S.provs=S.provs.filter(x=>x.id!==id);S.pagos=S.pagos.filter(x=>x.pv!==id);save();render()};
+window.addPg=pv=>{const a=askN('Monto del pago');if(a===null)return;const d=askDate();if(d===null)return;S.pagos.push({id:uid(),pv,a,d,ok:confirm('¿Este pago ya está pagado?\n(Aceptar = pagado, Cancelar = pendiente)')});save();render()};
+window.togP=id=>{const p=S.pagos.find(x=>x.id===id);p.ok=!p.ok;save();render()};
+/* Checklist y No olvidar */
+window.togT=(k,id)=>{const t=S[k].find(x=>x.id===id);t.ok=!t.ok;save();render()};
+window.addT=()=>{const e=pick('Etapa:',ETAPAS);if(e===null)return;const t=ask('Tarea');if(!t)return;S.tareas.push({id:uid(),t,e,ok:false});save();render()};
+window.addN=()=>{const t=ask('¿Qué no puedes olvidar?');if(!t)return;S.noolv.push({id:uid(),t,ok:false});save();render()};
+window.resetN=()=>{if(!confirm('¿Desmarcar todo?'))return;S.noolv.forEach(x=>x.ok=false);save();render()};
+/* Compartir y respaldo */
+function stats(){const ci=sumBy(S.items,sub),cok=sumBy(S.items.filter(i=>i.ok),sub),cp=sumBy(S.provs,p=>p.tot),pg=sumBy(S.pagos.filter(p=>p.ok),p=>p.a)+cok,comp=ci+cp,res=S.presu*S.col/100;return{ci,cok,cp,pg,comp,res,disp:S.presu-comp-res}}
+window.shR=()=>{const s=stats(),t=`Resumen de la boda\nPresupuesto: ${$c(S.presu)}\nComprometido: ${$c(s.comp)}\nPagado: ${$c(s.pg)}\nDisponible (tras imprevistos): ${$c(s.disp)}`;if(navigator.share)navigator.share({text:t}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(t);alert('Resumen copiado.')}};
+window.exp=async()=>{const txt=JSON.stringify({app:'nuestra-boda',S}),name='boda-'+today()+'.json';try{const f=new File([txt],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f]});else{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove()}}catch(e){if(e.name!=='AbortError')alert('No se pudo exportar.')}};
+window.imp=f=>{if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(o.app!=='nuestra-boda'||!o.S)throw 0;if(!confirm('Esto reemplaza todos tus datos actuales. ¿Continuar?'))return;localStorage.setItem(K,JSON.stringify(o.S));location.reload()}catch(e){alert('Archivo de respaldo inválido.')}};r.readAsText(f)};
+
+const V={
+res(){const s=stats(),dias=S.fecha?Math.ceil((new Date(S.fecha+'T12:00:00')-new Date())/864e5):null,tk=S.tareas.filter(t=>t.ok).length,pend=S.pagos.filter(p=>!p.ok).sort((a,b)=>a.d.localeCompare(b.d)).slice(0,5),pc=S.presu?s.comp/S.presu*100:0;
+ return `<div class="card" style="text-align:center"><div class="label">Cuenta regresiva</div><div class="big" style="font-size:42px">${dias===null?'—':dias>0?dias:dias===0?'¡Hoy!':'¡Ya fue!'}</div><div class="sub">${dias>0?'días para la boda · '+fD(S.fecha):S.fecha?fD(S.fecha):'Fija la fecha de la boda'}</div><div class="row" style="justify-content:center">${bt(S.fecha?'Cambiar fecha':'Fijar fecha','setFecha()','primary')}</div></div>
+ <div class="card"><div class="label">Presupuesto</div><div class="big">${S.presu?$c(S.presu):'—'}</div>${S.presu?bar(pc,pc>100?'var(--red)':pc>85?'var(--orange)':'var(--pink)')+`<div class="sub">Comprometido ${$c(s.comp)} (${Math.round(pc)}%) · imprevistos reservados ${$c(s.res)} (${S.col}%)</div><div class="sub">Disponible: <b class="${s.disp>=0?'ok':'bad'}">${$c(s.disp)}</b></div>`:'<div class="sub">Define cuánto tienes para la boda.</div>'}<div class="row">${bt('Presupuesto','setPresu()')}${bt('% imprevistos','setCol()')}${bt('Invitados','setInv()')}${bt('Compartir','shR()')}</div></div>
+ <div class="grid"><div class="card"><div class="label">Compras</div><div class="big">${$c(s.ci)}</div><div class="sub">${$c(s.cok)} ya comprado</div></div><div class="card"><div class="label">Proveedores</div><div class="big">${$c(s.cp)}</div><div class="sub">${S.provs.length} contratados</div></div><div class="card"><div class="label">Pagado hasta ahora</div><div class="big">${$c(s.pg)}</div><div class="sub">Por pagar: ${$c(s.comp-s.pg)}</div></div><div class="card"><div class="label">Costo por invitado</div><div class="big">${S.inv?$c(s.comp/S.inv):'—'}</div><div class="sub">${S.inv?S.inv+' invitados':'Indica los invitados'}</div></div></div>
+ <div class="card"><h3>Checklist</h3>${bar(S.tareas.length?tk/S.tareas.length*100:0)}<div class="sub">${tk} de ${S.tareas.length} tareas completas</div></div>
+ <div class="card"><h3>Próximos pagos</h3><div class="list">${pend.length?pend.map(p=>{const pv=S.provs.find(x=>x.id===p.pv),x=Math.ceil((new Date(p.d+'T12:00:00')-new Date())/864e5);return row($c(p.a)+' · '+(pv?pv.n:''),fD(p.d)+(x<0?' · <span class="bad">vencido</span>':x<=7?' · <span class="warn">en '+x+' días</span>':''),'')}).join(''):'<div class="empty">No hay pagos pendientes.</div>'}</div></div>
+ <div class="card"><h3>Respaldo</h3><div class="sub" style="margin-top:4px">Guarda tus datos en un archivo, o restáuralos desde uno (reemplaza lo actual). Útil también para pasarle los datos a tu pareja.</div><div class="row"><button class="btn" onclick="exp()">Exportar</button><button class="btn" onclick="$('imf').click()">Importar</button><input type="file" id="imf" accept=".json" hidden onchange="imp(this.files[0])"></div></div>`},
+com(){const s=stats();return `<div class="grid"><div class="card"><div class="label">Total</div><div class="big">${$c(s.ci)}</div><div class="sub">Estimado: ${$c(sumBy(S.items,i=>i.q*i.est))}</div></div><div class="card"><div class="label">Comprado</div><div class="big">${$c(s.cok)}</div><div class="sub">Pendiente: ${$c(s.ci-s.cok)}</div></div></div>
+ <div class="card"><h3>Por prioridad</h3>${PRI.map((p,i)=>`<div class="sub" style="display:flex;justify-content:space-between;margin-top:6px"><span>${p}</span><span>${$c(sumBy(S.items.filter(x=>x.pri===i),sub))}</span></div>`).join('')}${add('+ Agregar ítem','addI()')}</div>`+(CATS.filter(c=>S.items.some(i=>i.cat===c)).map(c=>{const l=S.items.filter(i=>i.cat===c);return `<div class="gh"><span class="label">${c}</span><span class="sub">${$c(sumBy(l,sub))}</span></div><div class="list">${l.map(i=>row(i.n,`${i.q} × ${$c(i.real!=null?i.real:i.est)} = <b>${$c(sub(i))}</b>${i.real!=null&&i.real!==i.est?` (est. ${$c(i.est)})`:''} · ${PRI[i.pri]}`,bt(i.ok?'✓ Comprado':'○ Comprar',`togI(${i.id})`,i.ok?'primary':'')+bt('✎',`editI(${i.id})`)+del('items',i.id),i.ok?'dim':'')).join('')}</div>`}).join('')||'<div class="empty">Aún no hay ítems en tu lista de compras.</div>')},
+pro(){return add('+ Agregar proveedor','addPv()')+(S.provs.length?S.provs.map(p=>{const ps=S.pagos.filter(x=>x.pv===p.id).sort((a,b)=>a.d.localeCompare(b.d)),pg=sumBy(ps.filter(x=>x.ok),x=>x.a);return `<div class="card" style="margin-top:12px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div><h3>${esc(p.n)}</h3><div class="sub">${esc(p.s||'')}${p.t?' · <a href="tel:'+esc(p.t)+'">'+esc(p.t)+'</a>':''}</div></div><div class="entry-actions">${bt('+ Pago',`addPg(${p.id})`,'primary')}${bt('✎',`editPv(${p.id})`)}${bt('×',`rmPv(${p.id})`,'danger')}</div></div>${bar(p.tot?pg/p.tot*100:0)}<div class="sub">Total ${$c(p.tot)} · pagado ${$c(pg)} · saldo <b class="${p.tot-pg>0?'warn':'ok'}">${$c(p.tot-pg)}</b></div>${ps.length?'<div class="list">'+ps.map(x=>row($c(x.a)+' · '+fD(x.d),x.ok?'Pagado':'Pendiente',bt(x.ok?'Deshacer':'Marcar pagado',`togP(${x.id})`,x.ok?'':'primary')+del('pagos',x.id),x.ok?'dim':'')).join('')+'</div>':''}</div>`}).join(''):'<div class="empty">Agrega fotógrafo, banquetera, local, DJ... con su total y pagos.</div>')},
+chk(){return add('+ Agregar tarea','addT()')+ETAPAS.map((e,i)=>{const l=S.tareas.filter(t=>t.e===i||t.e===e);if(!l.length)return '';return `<div class="gh"><span class="label">${e}</span><span class="sub">${l.filter(t=>t.ok).length}/${l.length}</span></div><div class="list">${l.map(t=>row(t.t,'',bt(t.ok?'✓':'○',`togT('tareas',${t.id})`,t.ok?'primary':'')+del('tareas',t.id),t.ok?'dim':'')).join('')}</div>`}).join('')},
+no(){const d=S.noolv.filter(x=>x.ok).length;return `<div class="card"><div class="label">Lista de no olvidar</div><div class="big">${d}/${S.noolv.length}</div>${bar(S.noolv.length?d/S.noolv.length*100:0)}<div class="sub">Revísala la noche anterior y la mañana de la boda.</div><div class="row"><button class="btn primary" onclick="addN()">+ Agregar</button>${bt('Desmarcar todo','resetN()')}</div></div><div class="list">${S.noolv.map(x=>row(x.t,'',bt(x.ok?'✓':'○',`togT('noolv',${x.id})`,x.ok?'primary':'')+del('noolv',x.id),x.ok?'dim':'')).join('')}</div>`}
+};
+function render(){$('tabs').innerHTML=TABS.map(([k,n])=>`<button class="btn tab ${k===tab?'active':''}" onclick="go('${k}')">${n}</button>`).join('');$('view').innerHTML=V[tab]()}
+render();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body></html>
